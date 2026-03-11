@@ -1,0 +1,80 @@
+services:
+  # Koudmain frontend
+  frontend:
+    build:
+      context: ${WEB_PATH_FOLDER}
+      target: development
+    container_name: koudmain-frontend
+    env_file: .env
+    volumes:
+      - ${WEB_PATH_FOLDER}:${WORKDIR_WEB_PATH_FOLDER}
+      - ${WORKDIR_WEB_PATH_FOLDER}/node_modules
+    depends_on:
+      - backend
+
+  # Koudmain mobile worker
+  mobile-worker:
+    build:
+      context: ${MOBILE_WORKER_PATH_FOLDER}
+      target: development
+    container_name: koudmain-mobile-worker
+    env_file: .env
+    ports:
+      - 8081:8081
+    volumes:
+      - ${MOBILE_WORKER_PATH_FOLDER}:${WORKDIR_MOBILE_WORKER_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_WORKER_PATH_FOLDER}/node_modules
+    depends_on:
+      - backend
+
+  # Koudmain mobile client
+  mobile-client:
+    build:
+      context: ${MOBILE_CLIENT_PATH_FOLDER}
+      target: development
+    container_name: koudmain-mobile-client
+    env_file: .env
+    ports:
+      - 8082:8082
+    volumes:
+      - ${MOBILE_CLIENT_PATH_FOLDER}:${WORKDIR_MOBILE_CLIENT_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_CLIENT_PATH_FOLDER}/node_modules
+    depends_on:
+      - backend
+
+  # Koudmain backend
+  backend:
+    build:
+      context: ${BACKEND_PATH_FOLDER}
+      target: development
+    container_name: koudmain-backend
+    env_file: .env
+    ports:
+      - 3000:3000
+    volumes:
+      - ${BACKEND_PATH_FOLDER}:${WORKDIR_BACKEND_PATH_FOLDER}
+      - ${WORKDIR_BACKEND_PATH_FOLDER}/node_modules
+    depends_on:
+      - db
+
+  # Koudmain postgresql database
+  db:
+    image: postgres:16-alpine
+    container_name: koudmain-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - koudmain-db:/var/lib/postgresql/data
+      - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  koudmain-db:
