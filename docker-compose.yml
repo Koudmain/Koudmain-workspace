@@ -17,8 +17,12 @@ services:
     build:
       context: ${MOBILE_WORKER_PATH_FOLDER}
       target: development
+      args:
+        REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
     container_name: koudmain-mobile-worker
     env_file: .env
+    stdin_open: true
+    tty: true
     ports:
       - 8081:8081
     volumes:
@@ -32,8 +36,12 @@ services:
     build:
       context: ${MOBILE_CLIENT_PATH_FOLDER}
       target: development
+      args:
+        REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
     container_name: koudmain-mobile-client
     env_file: .env
+    stdin_open: true
+    tty: true
     ports:
       - 8082:8082
     volumes:
