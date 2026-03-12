@@ -6,6 +6,8 @@ services:
       target: development
     container_name: koudmain-frontend
     env_file: .env
+    ports:
+      - 8080:8080
     volumes:
       - ${WEB_PATH_FOLDER}:${WORKDIR_WEB_PATH_FOLDER}
       - ${WORKDIR_WEB_PATH_FOLDER}/node_modules
@@ -79,7 +81,7 @@ services:
       - koudmain-db:/var/lib/postgresql/data
       - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 5
