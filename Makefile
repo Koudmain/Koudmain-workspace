@@ -37,6 +37,18 @@ build:
 logs:
 	$(DC) logs -f
 
+logs-worker:
+	$(DC) logs -f mobile-worker
+
+logs-client:
+	$(DC) logs -f mobile-client
+
+logs-backend:
+	$(DC) logs -f backend
+
+logs-web:
+	$(DC) logs -f frontend
+
 # --- Specific Commands ---
 
 # Start only the backend (DB will start automatically due to depends_on)
