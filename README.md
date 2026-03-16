@@ -8,7 +8,7 @@ Ce dépôt contient la configuration globale et Docker Compose pour le projet Ko
 
 Il est nécessaire de modifier les variables suivantes dans votre fichier `.env` pour indiquer les chemins absolus vers les différents dépôts sur votre machine locale :
 - `BACKEND_PATH_FOLDER` : Chemin vers le dépôt du backend.
-- `BACKEND_PATH_INIT_DB_FILE` : Chemin vers le fichier d'initialisation de la DB.
+- `BACKEND_PATH_INIT_DB_FILE` : Chemin vers le fichier d'initialisation de la DB (probablement `{BACKEND_PATH_FOLDER}/db/koudmain-db.sql`).
 - `WEB_PATH_FOLDER` : Chemin vers le dépôt du frontend web.
 - `MOBILE_WORKER_PATH_FOLDER` : Chemin vers le dépôt de l'application mobile worker.
 - `MOBILE_CLIENT_PATH_FOLDER` : Chemin vers le dépôt de l'application mobile client.
