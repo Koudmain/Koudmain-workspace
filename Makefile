@@ -2,8 +2,7 @@
 DC=docker compose
 
 # Get local IP for Expo
-LOCAL_IP := $(shell ip route get 1.1.1.1 | awk '{print $$7}' | head -n 1)
-# You can also use this command to extract IP: $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
+LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
