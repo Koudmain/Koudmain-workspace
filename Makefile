@@ -20,6 +20,7 @@ help:
 	@echo "  make backend     - Start only the backend (and the database)"
 	@echo "  make web         - Start the web frontend + backend (and DB)"
 	@echo "  make mobile      - Start the mobile apps + backend (and DB)"
+	@echo "  make db_test     - Start the test database"
 
 all: help
 
@@ -48,6 +49,9 @@ logs-backend:
 logs-web:
 	$(DC) logs -f frontend
 
+logs-test-db:
+	$(DC) logs -f db_test
+
 # --- Specific Commands ---
 
 # Start only the backend (DB will start automatically due to depends_on)
@@ -62,4 +66,7 @@ web:
 mobile:
 	$(DC) up -d mobile-worker mobile-client
 
-.PHONY: help all up down build logs backend web mobile
+db_test:
+	$(DC) up -d db_test
+
+.PHONY: help all up down build logs backend web mobile db_test
