@@ -1,5 +1,10 @@
+SHELL := /bin/bash
+
 # Docker-compose executable
 DC=docker compose
+
+# Environment file
+ENV_FILE=.env
 
 # Get local IP for Expo
 LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
@@ -51,6 +56,15 @@ logs-web:
 
 logs-test-db:
 	$(DC) logs -f db_test
+
+pull-all:
+	@echo "Reading .env and updating repositories..."
+	@while IFS='=' read -r key value; do \
+		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
+			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			git -C "$$clean_path" pull; \
+		fi \
+	done < $(ENV_FILE)
 
 # --- Specific Commands ---
 
