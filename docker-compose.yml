@@ -73,6 +73,23 @@ services:
     depends_on:
       - db
       - redis
+      - worker
+
+  # Koudmain worker
+  worker:
+    build:
+      context: ${WORKER_PATH_FOLDER}
+      target: development
+    container_name: koudmain-worker
+    env_file: .env
+    ports:
+      - 4000:4000
+    volumes:
+      - ${WORKER_PATH_FOLDER}:${WORKDIR_WORKER_PATH_FOLDER}
+      - ${WORKDIR_WORKER_PATH_FOLDER}/tmp
+    depends_on:
+      - db
+      - redis
 
   # Koudmain postgresql database
   db:

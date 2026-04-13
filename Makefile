@@ -51,6 +51,9 @@ logs-client:
 logs-backend:
 	$(DC) logs -f backend
 
+logs-worker-go:
+	$(DC) logs -f worker
+
 logs-web:
 	$(DC) logs -f frontend
 
