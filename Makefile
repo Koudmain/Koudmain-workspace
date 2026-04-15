@@ -51,8 +51,17 @@ logs-client:
 logs-backend:
 	$(DC) logs -f backend
 
+logs-worker-go:
+	$(DC) logs -f worker
+
 logs-web:
 	$(DC) logs -f frontend
+
+logs-db:
+	$(DC) logs -f db
+
+logs-redis:
+	$(DC) logs -f redis
 
 logs-test-db:
 	$(DC) logs -f db_test
@@ -83,4 +92,4 @@ mobile:
 db_test:
 	$(DC) up -d db_test
 
-.PHONY: help all up down build logs backend web mobile db_test
+.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis

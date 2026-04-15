@@ -72,6 +72,24 @@ services:
       - ${WORKDIR_BACKEND_PATH_FOLDER}/node_modules
     depends_on:
       - db
+      - redis
+      - worker
+
+  # Koudmain worker
+  worker:
+    build:
+      context: ${WORKER_PATH_FOLDER}
+      target: development
+    container_name: koudmain-worker
+    env_file: .env
+    ports:
+      - 4000:4000
+    volumes:
+      - ${WORKER_PATH_FOLDER}:${WORKDIR_WORKER_PATH_FOLDER}
+      - ${WORKDIR_WORKER_PATH_FOLDER}/tmp
+    depends_on:
+      - db
+      - redis
 
   # Koudmain postgresql database
   db:
@@ -92,6 +110,23 @@ services:
       timeout: 10s
       retries: 5
 
+  # Koudmain redis cache
+  redis:
+    image: redis:7-alpine
+    container_name: koudmain-redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_password}
+    ports:
+      - 6379:6379
+    volumes:
+      - koudmain-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
+
   db_test:
     image: postgres:16-alpine
     container_name: koudmain-db-test
@@ -105,7 +140,8 @@ services:
       - koudmain-db-test:/var/lib/postgresql/data
       - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_TEST_USER}", "-d", "${DB_TEST_NAME}"]
+      test:
+        ["CMD", "pg_isready", "-U", "${DB_TEST_USER}", "-d", "${DB_TEST_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -113,3 +149,4 @@ services:
 volumes:
   koudmain-db:
   koudmain-db-test:
+  koudmain-redis:
