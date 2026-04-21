@@ -106,4 +106,13 @@ dev-all:
 		fi \
 	done < $(ENV_FILE)
 
+configure-pre-commit:
+	@echo "Reading .env and configuring pre-commit in all repositories..."
+	@while IFS='=' read -r key value; do \
+		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
+			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			pre-commit install; \
+		fi \
+	done < $(ENV_FILE)
+
 .PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all
