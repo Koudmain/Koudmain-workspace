@@ -1,7 +1,7 @@
 # DevOps team code owner configuration
 
-**/Dockerfile @Koudmain/Koudmain-team-devops
-**/.dockerignore @Koudmain/Koudmain-team-devops
-**/docker-compose.* @Koudmain/Koudmain-team-devops
-**/Makefile @Koudmain/Koudmain-team-devops
-.github/ @Koudmain/Koudmain-team-devops
+**/Dockerfile @Koudmain/Thomas222222222
+**/.dockerignore @Koudmain/Thomas222222222
+**/docker-compose.* @Koudmain/Thomas222222222
+**/Makefile @Koudmain/Thomas222222222
+.github/ @Koudmain/Thomas222222222
