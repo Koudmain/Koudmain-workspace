@@ -39,6 +39,8 @@ down:
 build:
 	$(DC) build
 
+# --- Logs ---
+
 logs:
 	$(DC) logs -f
 
@@ -66,15 +68,6 @@ logs-redis:
 logs-test-db:
 	$(DC) logs -f db_test
 
-pull-all:
-	@echo "Reading .env and updating repositories..."
-	@while IFS='=' read -r key value; do \
-		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
-			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
-			git -C "$$clean_path" pull; \
-		fi \
-	done < $(ENV_FILE)
-
 # --- Specific Commands ---
 
 # Start only the backend (DB will start automatically due to depends_on)
@@ -92,4 +85,34 @@ mobile:
 db_test:
 	$(DC) up -d db_test
 
-.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis
+# --- Management commands ---
+
+pull-all:
+	@echo "Reading .env and updating repositories..."
+	@while IFS='=' read -r key value; do \
+		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
+			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			git -C "$$clean_path" pull; \
+		fi \
+	done < $(ENV_FILE)
+
+dev-all:
+	@echo "Reading .env and switching repositories to dev branch..."
+	@while IFS='=' read -r key value; do \
+		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
+			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			echo "-> Checking out dev in $$clean_path"; \
+			git -C "$$clean_path" checkout dev || exit 1; \
+		fi \
+	done < $(ENV_FILE)
+
+configure-pre-commit:
+	@echo "Reading .env and configuring pre-commit in all repositories..."
+	@while IFS='=' read -r key value; do \
+		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
+			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			pre-commit install; \
+		fi \
+	done < $(ENV_FILE)
+
+.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all
