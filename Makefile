@@ -111,10 +111,10 @@ configure-pre-commit:
 	@while IFS='=' read -r key value; do \
 		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
 			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
-			echo "Installed in $$clean_path"; \
+			cd $$clean_path; \
 			pre-commit install; \
+			echo "Installed in $$clean_path"; \
 		fi \
 	done < $(ENV_FILE)
-	@pre-commit uninstall > /dev/null; \
 
 .PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all
