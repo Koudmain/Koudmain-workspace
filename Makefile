@@ -115,5 +115,6 @@ configure-pre-commit:
 			pre-commit install; \
 		fi \
 	done < $(ENV_FILE)
+	@pre-commit uninstall > /dev/null; \
 
 .PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all
