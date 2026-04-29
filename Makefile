@@ -111,6 +111,7 @@ configure-pre-commit:
 	@while IFS='=' read -r key value; do \
 		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
 			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
+			echo "Installed in $$clean_path"; \
 			pre-commit install; \
 		fi \
 	done < $(ENV_FILE)
