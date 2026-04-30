@@ -13,6 +13,16 @@ Il est nécessaire de modifier les variables suivantes dans votre fichier `.env`
 - `MOBILE_WORKER_PATH_FOLDER` : Chemin vers le dépôt de l'application mobile worker.
 - `MOBILE_CLIENT_PATH_FOLDER` : Chemin vers le dépôt de l'application mobile client.
 
+## Configurer le pre-commit à travers tous les repos
+
+- Lance cette commande afin d'initier le binaire initiale.
+`pipx install pre-commit && pipx ensurepath`
+
+- Réinitialise le terminal
+
+- Lance la règle du Makefile pour setup le pre-commit à travers tous les repos
+`make configure-pre-commit`
+
 ## Utilisation de Docker (Makefile)
 
 Un `Makefile` est mis à disposition pour simplifier le lancement et la gestion des différents services Docker.
