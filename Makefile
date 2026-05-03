@@ -71,8 +71,8 @@ logs-worker:
 logs-backend:
 	$(DC) logs -f backend
 
-logs-worker-go:
-	$(DC) logs -f worker
+logs-employer-go:
+	$(DC) logs -f employer
 
 logs-web:
 	$(DC) logs -f frontend
