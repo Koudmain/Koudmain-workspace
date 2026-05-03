@@ -14,11 +14,33 @@ services:
     depends_on:
       - backend
 
-  # Koudmain mobile worker
+  # Koudmain mobile employer
+  mobile-employer:
+    build:
+      context: ${MOBILE_PATH_FOLDER}
+      target: development-employer
+      args:
+        REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+    container_name: koudmain-mobile-employer
+    env_file: .env
+    environment:
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+      EXPO_PUBLIC_REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+    stdin_open: true
+    tty: true
+    ports:
+      - 8082:8082
+    volumes:
+      - ${MOBILE_PATH_FOLDER}:${WORKDIR_MOBILE_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/node_modules
+    depends_on:
+      - backend
+
+  # Koudmain mobile client
   mobile-worker:
     build:
-      context: ${MOBILE_WORKER_PATH_FOLDER}
-      target: development
+      context: ${MOBILE_PATH_FOLDER}
+      target: development-worker
       args:
         REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
     container_name: koudmain-mobile-worker
@@ -29,32 +51,10 @@ services:
     stdin_open: true
     tty: true
     ports:
-      - 8081:8081
+      - 8083:8083
     volumes:
-      - ${MOBILE_WORKER_PATH_FOLDER}:${WORKDIR_MOBILE_WORKER_PATH_FOLDER}
-      - ${WORKDIR_MOBILE_WORKER_PATH_FOLDER}/node_modules
-    depends_on:
-      - backend
-
-  # Koudmain mobile client
-  mobile-client:
-    build:
-      context: ${MOBILE_CLIENT_PATH_FOLDER}
-      target: development
-      args:
-        REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
-    container_name: koudmain-mobile-client
-    env_file: .env
-    environment:
-      REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
-      EXPO_PUBLIC_REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
-    stdin_open: true
-    tty: true
-    ports:
-      - 8082:8082
-    volumes:
-      - ${MOBILE_CLIENT_PATH_FOLDER}:${WORKDIR_MOBILE_CLIENT_PATH_FOLDER}
-      - ${WORKDIR_MOBILE_CLIENT_PATH_FOLDER}/node_modules
+      - ${MOBILE_PATH_FOLDER}:${WORKDIR_MOBILE_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/node_modules
     depends_on:
       - backend
 
