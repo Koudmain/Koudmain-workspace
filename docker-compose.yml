@@ -36,7 +36,7 @@ services:
     depends_on:
       - backend
 
-  # Koudmain mobile client
+  # Koudmain mobile worker
   mobile-worker:
     build:
       context: ${MOBILE_PATH_FOLDER}
