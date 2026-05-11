@@ -135,7 +135,7 @@ services:
       POSTGRES_PASSWORD: ${DB_TEST_PASSWORD}
       POSTGRES_DB: ${DB_TEST_NAME}
     ports:
-      - "${DB_TEST_PORT}:5432"
+      - "${DB_TEST_PORT}:${DB_TEST_DOCKER_PORT}"
     volumes:
       - koudmain-db-test:/var/lib/postgresql/data
       - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
