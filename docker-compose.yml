@@ -103,7 +103,6 @@ services:
       - 5432:5432
     volumes:
       - koudmain-db:/var/lib/postgresql/data
-      - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
       interval: 30s
