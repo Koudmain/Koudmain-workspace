@@ -12,20 +12,37 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+# Colors for Terminal
+BLUE   := $(shell tput -Txterm setaf 4)
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+RESET  := $(shell tput -Txterm sgr0)
+
 help:
-	@echo "Koudmain - Docker Commands :"
+	@echo "${BLUE}Koudmain - Docker Development Environment${RESET}"
+	@echo "-------------------------------------------------------"
+	@echo "${YELLOW}Usage:${RESET} make <command>"
 	@echo ""
-	@echo "General Commands:"
-	@echo "  make up          - Start all services in the background"
-	@echo "  make down        - Stop and remove all containers"
-	@echo "  make build       - Build or rebuild all images"
-	@echo "  make logs        - View output from all containers (real-time)"
+	@echo "${BLUE}General Commands:${RESET}"
+	@echo "  ${GREEN}up${RESET}                Start all services in background [cite: 1]"
+	@echo "  ${GREEN}down${RESET}              Stop and remove all containers [cite: 1]"
+	@echo "  ${GREEN}build${RESET}             Build or rebuild all images [cite: 1]"
+	@echo "  ${GREEN}logs${RESET}              View real-time output from all containers [cite: 1, 2]"
 	@echo ""
-	@echo "Specific Commands:"
-	@echo "  make backend     - Start only the backend (and the database)"
-	@echo "  make web         - Start the web frontend + backend (and DB)"
-	@echo "  make mobile      - Start the mobile apps + backend (and DB)"
-	@echo "  make db_test     - Start the test database"
+	@echo "${BLUE}Specific Services:${RESET}"
+	@echo "  ${GREEN}backend${RESET}           Start backend and database [cite: 2]"
+	@echo "  ${GREEN}web${RESET}               Start web frontend + backend [cite: 2]"
+	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend [cite: 2]"
+	@echo "  ${GREEN}db_test${RESET}           Start the test database only [cite: 2]"
+	@echo ""
+	@echo "${BLUE}Management & Git:${RESET}"
+	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull) [cite: 3, 4, 5]"
+	@echo "  ${GREEN}dev-all${RESET}           Switch all repositories to 'dev' branch [cite: 6, 7]"
+	@echo "  ${GREEN}configure-pre-commit${RESET}  Install pre-commit hooks everywhere [cite: 8, 9]"
+	@echo ""
+	@echo "${BLUE}Logs (Specific):${RESET}"
+	@echo "  ${YELLOW}logs-backend, logs-web, logs-mobile, logs-db, logs-redis...${RESET}"
+	@echo "-------------------------------------------------------"
 
 all: help
 
