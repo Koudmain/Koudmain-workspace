@@ -137,7 +137,6 @@ services:
       - "${DB_TEST_PORT}:${DB_TEST_DOCKER_PORT}"
     volumes:
       - koudmain-db-test:/var/lib/postgresql/data
-      - ${BACKEND_PATH_INIT_DB_FILE}:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
       test:
         ["CMD", "pg_isready", "-U", "${DB_TEST_USER}", "-d", "${DB_TEST_NAME}"]
