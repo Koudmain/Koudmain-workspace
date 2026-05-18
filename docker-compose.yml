@@ -93,7 +93,7 @@ services:
 
   # Koudmain postgresql database
   db:
-    image: postgis/postgis:16-3.4
+    image: postgis/postgis:16-3.5-alpine
     container_name: koudmain-db
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -128,7 +128,7 @@ services:
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
 
   db_test:
-    image: postgis/postgis:16-3.4
+    image: postgis/postgis:16-3.5-alpine
     container_name: koudmain-db-test
     environment:
       POSTGRES_USER: ${DB_TEST_USER}
