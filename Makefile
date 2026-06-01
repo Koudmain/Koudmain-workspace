@@ -138,13 +138,13 @@ configure-pre-commit:
 # --- Database Management ---
 
 db-reset:
-	@echo "${YELLOW}⚠️ WARNING: This will DELETE the entire database and recreate the schema.${RESET}"
+	@echo "${YELLOW}WARNING: This will DELETE the entire database and recreate the schema.${RESET}"
 	@read -p "Are you sure you want to proceed? [y/N] " ans; \
 	if [ "$$ans" = "y" ] || [ "$$ans" = "Y" ]; then \
 		$(DC) exec backend sh -c "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate"; \
-		echo "${GREEN}✅ Database has been reset successfully (empty schema).${RESET}"; \
+		echo "${GREEN}Database has been reset successfully (empty schema).${RESET}"; \
 	else \
-		echo "${BLUE}❌ Operation cancelled.${RESET}"; \
+		echo "${BLUE}Operation cancelled.${RESET}"; \
 	fi
 
 .PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all db-reset
