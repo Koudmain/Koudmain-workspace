@@ -34,7 +34,7 @@ help:
 	@echo "  ${GREEN}web${RESET}               Start web frontend + backend"
 	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend"
 	@echo "  ${GREEN}db_test${RESET}           Start the test database only"
-	@echo "  ${GREEN}make db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
+	@echo "  ${GREEN}db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
 	@echo ""
 	@echo "${BLUE}Management & Git:${RESET}"
 	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
