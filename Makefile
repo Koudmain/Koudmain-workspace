@@ -12,20 +12,38 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+# Colors for Terminal
+BLUE   := $(shell tput -Txterm setaf 4)
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+RESET  := $(shell tput -Txterm sgr0)
+
 help:
-	@echo "Koudmain - Docker Commands :"
+	@echo "${BLUE}Koudmain - Docker Development Environment${RESET}"
+	@echo "-------------------------------------------------------"
+	@echo "${YELLOW}Usage:${RESET} make <command>"
 	@echo ""
-	@echo "General Commands:"
-	@echo "  make up          - Start all services in the background"
-	@echo "  make down        - Stop and remove all containers"
-	@echo "  make build       - Build or rebuild all images"
-	@echo "  make logs        - View output from all containers (real-time)"
+	@echo "${BLUE}General Commands:${RESET}"
+	@echo "  ${GREEN}up${RESET}                Start all services in background"
+	@echo "  ${GREEN}down${RESET}              Stop and remove all containers"
+	@echo "  ${GREEN}build${RESET}             Build or rebuild all images"
+	@echo "  ${GREEN}logs${RESET}              View real-time output from all containers"
 	@echo ""
-	@echo "Specific Commands:"
-	@echo "  make backend     - Start only the backend (and the database)"
-	@echo "  make web         - Start the web frontend + backend (and DB)"
-	@echo "  make mobile      - Start the mobile apps + backend (and DB)"
-	@echo "  make db_test     - Start the test database"
+	@echo "${BLUE}Specific Services:${RESET}"
+	@echo "  ${GREEN}backend${RESET}           Start backend and database"
+	@echo "  ${GREEN}web${RESET}               Start web frontend + backend"
+	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend"
+	@echo "  ${GREEN}db_test${RESET}           Start the test database only"
+	@echo "  ${GREEN}db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
+	@echo ""
+	@echo "${BLUE}Management & Git:${RESET}"
+	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
+	@echo "  ${GREEN}dev-all${RESET}           Switch all repositories to 'dev' branch"
+	@echo "  ${GREEN}configure-pre-commit${RESET}  Install pre-commit hooks everywhere"
+	@echo ""
+	@echo "${BLUE}Logs (Specific):${RESET}"
+	@echo "  ${YELLOW}logs-backend, logs-web, logs-mobile, logs-db, logs-redis...${RESET}"
+	@echo "-------------------------------------------------------"
 
 all: help
 
@@ -117,4 +135,16 @@ configure-pre-commit:
 		fi \
 	done < $(ENV_FILE)
 
-.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all
+# --- Database Management ---
+
+db-reset:
+	@echo "${YELLOW}WARNING: This will DELETE the entire database and recreate the schema.${RESET}"
+	@read -p "Are you sure you want to proceed? [y/N] " ans; \
+	if [ "$$ans" = "y" ] || [ "$$ans" = "Y" ]; then \
+		$(DC) exec backend sh -c "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate"; \
+		echo "${GREEN}Database has been reset successfully (empty schema).${RESET}"; \
+	else \
+		echo "${BLUE}Operation cancelled.${RESET}"; \
+	fi
+
+.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all db-reset
