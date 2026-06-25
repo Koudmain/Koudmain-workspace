@@ -12,6 +12,8 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+export LOCAL_IP := $(LOCAL_IP)
+
 # Colors for Terminal
 BLUE   := $(shell tput -Txterm setaf 4)
 GREEN  := $(shell tput -Txterm setaf 2)
