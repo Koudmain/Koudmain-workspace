@@ -30,5 +30,5 @@ docker exec -it koudmain-documenso npm run prisma:migrate-reset --workspace=@doc
 
 echo -e "\n${BLUE}==================================================${NC}"
 echo -e "${GREEN}Configuration terminée avec succès !${NC}"
-echo -e "${GREEN}L'interface Documenso est disponible sur le port 3010${NC}"
+echo -e "${GREEN}L'interface Documenso est disponible sur le port 3010 de votre machine${NC}"
 echo -e "${BLUE}==================================================${NC}"
