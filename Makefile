@@ -113,6 +113,9 @@ db_test:
 documenso:
 	$(DC) up -d documenso
 
+build-documenso:
+	$(DC) build documenso
+
 # --- Management commands ---
 
 pull-all:
