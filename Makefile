@@ -62,11 +62,11 @@ build:
 logs:
 	$(DC) logs -f
 
+logs-employer:
+	$(DC) logs -f mobile-employer
+
 logs-worker:
 	$(DC) logs -f mobile-worker
-
-logs-client:
-	$(DC) logs -f mobile-client
 
 logs-backend:
 	$(DC) logs -f backend
@@ -98,7 +98,7 @@ web:
 
 # Start the mobile applications and the backend
 mobile:
-	$(DC) up -d mobile-worker mobile-client
+	$(DC) up -d mobile-employer mobile-worker
 
 db_test:
 	$(DC) up -d db_test
