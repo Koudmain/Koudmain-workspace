@@ -38,7 +38,7 @@ help:
 	@echo ""
 	@echo "${BLUE}Management & Git:${RESET}"
 	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
-	@echo "  ${GREEN}dev-all${RESET}           Switch all repositories to 'dev' branch"
+	@echo "  ${GREEN}main-all${RESET}          Switch all repositories to 'main' branch"
 	@echo "  ${GREEN}configure-pre-commit${RESET}  Install pre-commit hooks everywhere"
 	@echo ""
 	@echo "${BLUE}Logs (Specific):${RESET}"
@@ -114,13 +114,13 @@ pull-all:
 		fi \
 	done < $(ENV_FILE)
 
-dev-all:
-	@echo "Reading .env and switching repositories to dev branch..."
+main-all:
+	@echo "Reading .env and switching repositories to main branch..."
 	@while IFS='=' read -r key value; do \
 		if [[ "$$key" == *PATH_FOLDER ]] && [[ "$$key" != WORKDIR* ]]; then \
 			clean_path=$$(echo "$$value" | tr -d "'" | tr -d '"' | tr -d '\r'); \
-			echo "-> Checking out dev in $$clean_path"; \
-			git -C "$$clean_path" checkout dev || exit 1; \
+			echo "-> Checking out main in $$clean_path"; \
+			git -C "$$clean_path" checkout main || exit 1; \
 		fi \
 	done < $(ENV_FILE)
 
@@ -147,4 +147,4 @@ db-reset:
 		echo "${BLUE}Operation cancelled.${RESET}"; \
 	fi
 
-.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all pull-dev-all db-reset
+.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all main-all db-reset
