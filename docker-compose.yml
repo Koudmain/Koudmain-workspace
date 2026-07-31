@@ -63,8 +63,12 @@ services:
     build:
       context: ${BACKEND_PATH_FOLDER}
       target: development
+      args:
+        LOCAL_IP: ${LOCAL_IP:-}
     container_name: koudmain-backend
     env_file: .env
+    environment:
+      LOCAL_IP: ${LOCAL_IP:-}
     ports:
       - 3000:3000
     volumes:
@@ -104,6 +108,7 @@ services:
       - 5432:5432
     volumes:
       - koudmain-db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
       interval: 30s
@@ -145,7 +150,68 @@ services:
       timeout: 10s
       retries: 5
 
+  documenso:
+    build:
+      context: ${DOCUMENSO_PATH_FOLDER}
+      args:
+        LOCAL_IP: ${LOCAL_IP:-}
+      dockerfile: apps/remix/Dockerfile
+    container_name: koudmain-documenso
+    ports:
+      - 3010:3000
+    env_file:
+      - .env
+      - .env.documenso
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mailserver:
+        condition: service_started
+      minio:
+        condition: service_started
+      gotenberg:
+        condition: service_started
+    command: >
+      sh -c "
+        echo 'Synchronisation du schéma Prisma...' &&
+        npx prisma db push --schema=packages/prisma/schema.prisma &&
+        echo 'Démarrage de Documenso...' &&
+        npm run dev --workspace=@documenso/remix -- --host
+      "
+    volumes:
+      - ./cert.p12:/app/cert.p12:ro
+
+  mailserver:
+    image: inbucket/inbucket
+    container_name: mailserver
+    ports:
+      - 9000:9000
+      - 2500:2500
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9002:9002
+      - 9001:9001
+    volumes:
+      - koudmain-minio:/data
+    environment:
+      MINIO_ROOT_USER: documenso
+      MINIO_ROOT_PASSWORD: password
+    entrypoint: sh
+    command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    ports:
+      - 3005:3000
+
 volumes:
   koudmain-db:
   koudmain-db-test:
   koudmain-redis:
+  koudmain-minio:
