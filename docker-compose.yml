@@ -21,6 +21,7 @@ services:
       target: development-employer
       args:
         REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+        EXPO_CLIENT_FLAG: ${EXPO_CLIENT_FLAG:---go}
     container_name: koudmain-mobile-employer
     env_file: .env
     environment:
@@ -44,6 +45,7 @@ services:
       target: development-worker
       args:
         REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+        EXPO_CLIENT_FLAG: ${EXPO_CLIENT_FLAG:---go}
     container_name: koudmain-mobile-worker
     env_file: .env
     environment:
@@ -129,7 +131,7 @@ services:
       retries: 5
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
 
-  db_test:
+  db-test:
     image: postgis/postgis:16-3.5-alpine
     container_name: koudmain-db-test
     environment:

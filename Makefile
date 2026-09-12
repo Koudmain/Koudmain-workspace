@@ -33,7 +33,9 @@ help:
 	@echo "  ${GREEN}backend${RESET}           Start backend and database"
 	@echo "  ${GREEN}web${RESET}               Start web frontend + backend"
 	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend"
-	@echo "  ${GREEN}db_test${RESET}           Start the test database only"
+	@echo "  ${GREEN}mobile-worker${RESET}     Start mobile worker app + backend"
+	@echo "  ${GREEN}mobile-employer${RESET}   Start mobile employer app + backend"
+	@echo "  ${GREEN}db-test${RESET}           Start the test database only"
 	@echo "  ${GREEN}db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
 	@echo ""
 	@echo "${BLUE}Management & Git:${RESET}"
@@ -62,10 +64,10 @@ build:
 logs:
 	$(DC) logs -f
 
-logs-employer:
+logs-mobile-employer:
 	$(DC) logs -f mobile-employer
 
-logs-worker:
+logs-mobile-worker:
 	$(DC) logs -f mobile-worker
 
 logs-backend:
@@ -100,8 +102,16 @@ web:
 mobile:
 	$(DC) up -d mobile-employer mobile-worker
 
-db_test:
-	$(DC) up -d db_test
+# Start the mobile worker application and the backend
+mobile-worker:
+	$(DC) up -d mobile-worker
+
+# Start the mobile employer application and the backend
+mobile-employer:
+	$(DC) up -d mobile-employer
+
+db-test:
+	$(DC) up -d db-test
 
 # --- Management commands ---
 
