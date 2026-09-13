@@ -109,7 +109,7 @@ services:
     volumes:
       - koudmain-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -125,12 +125,13 @@ services:
     volumes:
       - koudmain-redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
 
+  # Koudmain postgresql database for testing
   db-test:
     image: postgis/postgis:16-3.5-alpine
     container_name: koudmain-db-test
@@ -143,13 +144,73 @@ services:
     volumes:
       - koudmain-db-test:/var/lib/postgresql/data
     healthcheck:
-      test:
-        ["CMD", "pg_isready", "-U", "${DB_TEST_USER}", "-d", "${DB_TEST_NAME}"]
+      test: [ "CMD", "pg_isready", "-U", "${DB_TEST_USER}", "-d", "${DB_TEST_NAME}" ]
       interval: 30s
       timeout: 10s
       retries: 5
+
+  # Builder APK employer
+  build-apk-employer:
+    build:
+      context: ${MOBILE_PATH_FOLDER}
+      dockerfile: Dockerfile.android
+    image: koudmain-android-builder:latest
+    working_dir: ${WORKDIR_MOBILE_PATH_FOLDER}
+    cpus: 4
+    mem_limit: 6g
+    environment:
+      - HOST_UID=${HOST_UID}
+      - HOST_GID=${HOST_GID}
+    profiles:
+      - "tools"
+    volumes:
+      - ${MOBILE_PATH_FOLDER}:${WORKDIR_MOBILE_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/node_modules
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/apps/employer-app/node_modules
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/apps/worker-app/node_modules
+      - gradle-cache:/root/.gradle
+      - ./builds:${WORKDIR_MOBILE_PATH_FOLDER}/builds
+      - ~/.expo:/root/.expo
+    command: >
+      bash -c "
+        git config --global --add safe.directory '*' &&
+        pnpm install --frozen-lockfile &&
+        pnpm --filter @koudmain/employer exec eas build --platform android --profile development --local --output /usr/src/app/builds/employer-dev.apk &&
+        chown -R ${HOST_UID}:${HOST_GID} /usr/src/app/builds
+      "
+
+  # Builder APK worker
+  build-apk-worker:
+    build:
+      context: ${MOBILE_PATH_FOLDER}
+      dockerfile: Dockerfile.android
+    image: koudmain-android-builder:latest
+    working_dir: ${WORKDIR_MOBILE_PATH_FOLDER}
+    cpus: 4
+    mem_limit: 6g
+    environment:
+      - HOST_UID=${HOST_UID}
+      - HOST_GID=${HOST_GID}
+    profiles:
+      - "tools"
+    volumes:
+      - ${MOBILE_PATH_FOLDER}:${WORKDIR_MOBILE_PATH_FOLDER}
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/node_modules
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/apps/employer-app/node_modules
+      - ${WORKDIR_MOBILE_PATH_FOLDER}/apps/worker-app/node_modules
+      - gradle-cache:/root/.gradle
+      - ./builds:${WORKDIR_MOBILE_PATH_FOLDER}/builds
+      - ~/.expo:/root/.expo
+    command: >
+      bash -c "
+        git config --global --add safe.directory '*' &&
+        pnpm install --frozen-lockfile &&
+        pnpm --filter @koudmain/worker exec eas build  --platform android --profile development --local --output /usr/src/app/builds/worker-dev.apk &&
+        chown -R ${HOST_UID}:${HOST_GID} /usr/src/app/builds
+      "
 
 volumes:
   koudmain-db:
   koudmain-db-test:
   koudmain-redis:
+  gradle-cache:

@@ -12,6 +12,10 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+# Export host UID and GID for volume permissions
+export HOST_UID := $(shell id -u)
+export HOST_GID := $(shell id -g)
+
 # Colors for Terminal
 BLUE   := $(shell tput -Txterm setaf 4)
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -42,6 +46,11 @@ help:
 	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
 	@echo "  ${GREEN}main-all${RESET}          Switch all repositories to 'main' branch"
 	@echo "  ${GREEN}configure-pre-commit${RESET}  Install pre-commit hooks everywhere"
+	@echo ""
+	@echo "${BLUE}Mobile APK Builds (Docker):${RESET}"
+	@echo "  ${GREEN}build-apk-images${RESET}      Build the Android builder Docker image"
+	@echo "  ${GREEN}build-apk-employer${RESET}    Generate Android dev APK for employer app"
+	@echo "  ${GREEN}build-apk-worker${RESET}      Generate Android dev APK for worker app"
 	@echo ""
 	@echo "${BLUE}Logs (Specific):${RESET}"
 	@echo "  ${YELLOW}logs-backend, logs-web, logs-mobile, logs-db, logs-redis...${RESET}"
@@ -113,6 +122,24 @@ mobile-employer:
 db-test:
 	$(DC) up -d db-test
 
+# --- Mobile APK Builds ---
+
+# Build the Android APK builder Docker image (under 'tools' profile)
+build-apk-images:
+	$(DC) --profile tools build
+
+# Build Android APK for employer app
+build-apk-employer:
+	@mkdir -p builds
+	@HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(DC) run --rm build-apk-employer
+	@echo "${GREEN}APK generated: builds/employer-dev.apk${RESET}"
+
+# Build Android APK for worker app
+build-apk-worker:
+	@mkdir -p builds
+	@HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(DC) run --rm build-apk-worker
+	@echo "${GREEN}APK generated: builds/worker-dev.apk${RESET}"
+
 # --- Management commands ---
 
 pull-all:
@@ -157,4 +184,4 @@ db-reset:
 		echo "${BLUE}Operation cancelled.${RESET}"; \
 	fi
 
-.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all main-all db-reset
+.PHONY: help all up down build logs backend web mobile db-test logs-db logs-redis pull-all main-all db-reset build-apk-images build-apk-employer build-apk-worker
