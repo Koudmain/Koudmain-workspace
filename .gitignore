@@ -1,1 +1,6 @@
 .env
+.env.documenso
+
+# Ignore sensitive files (like certificates and keys)
+*.p12
+*.pem
