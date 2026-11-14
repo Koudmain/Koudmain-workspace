@@ -12,6 +12,8 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+export LOCAL_IP := $(LOCAL_IP)
+
 # Colors for Terminal
 BLUE   := $(shell tput -Txterm setaf 4)
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -35,6 +37,7 @@ help:
 	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend"
 	@echo "  ${GREEN}db_test${RESET}           Start the test database only"
 	@echo "  ${GREEN}db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
+	@echo "  ${GREEN}documenso${RESET}         Start Documenso platform"
 	@echo ""
 	@echo "${BLUE}Management & Git:${RESET}"
 	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
@@ -86,6 +89,9 @@ logs-redis:
 logs-test-db:
 	$(DC) logs -f db_test
 
+logs-documenso:
+	$(DC) logs -f documenso
+
 # --- Specific Commands ---
 
 # Start only the backend (DB will start automatically due to depends_on)
@@ -102,6 +108,13 @@ mobile:
 
 db_test:
 	$(DC) up -d db_test
+
+# Start the Documenso platform
+documenso:
+	$(DC) up -d documenso
+
+build-documenso:
+	$(DC) build documenso
 
 # --- Management commands ---
 
