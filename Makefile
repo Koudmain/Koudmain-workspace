@@ -12,6 +12,10 @@ LOCAL_IP := $(shell ip route get 1.1.1.1 | sed -n 's/.*src \([0-9.]*\).*/\1/p')
 # Export for docker-compose to use in build args
 export REACT_NATIVE_PACKAGER_HOSTNAME := $(LOCAL_IP)
 
+# Export host UID and GID for volume permissions
+export HOST_UID := $(shell id -u)
+export HOST_GID := $(shell id -g)
+
 # Colors for Terminal
 BLUE   := $(shell tput -Txterm setaf 4)
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -33,13 +37,20 @@ help:
 	@echo "  ${GREEN}backend${RESET}           Start backend and database"
 	@echo "  ${GREEN}web${RESET}               Start web frontend + backend"
 	@echo "  ${GREEN}mobile${RESET}            Start mobile apps (worker & client) + backend"
-	@echo "  ${GREEN}db_test${RESET}           Start the test database only"
+	@echo "  ${GREEN}mobile-worker${RESET}     Start mobile worker app + backend"
+	@echo "  ${GREEN}mobile-employer${RESET}   Start mobile employer app + backend"
+	@echo "  ${GREEN}db-test${RESET}           Start the test database only"
 	@echo "  ${GREEN}db-reset${RESET}    Wipe and recreate the database (Confirmation required)"
 	@echo ""
 	@echo "${BLUE}Management & Git:${RESET}"
 	@echo "  ${GREEN}pull-all${RESET}          Update all repositories (git pull)"
 	@echo "  ${GREEN}main-all${RESET}          Switch all repositories to 'main' branch"
 	@echo "  ${GREEN}configure-pre-commit${RESET}  Install pre-commit hooks everywhere"
+	@echo ""
+	@echo "${BLUE}Mobile APK Builds (Docker):${RESET}"
+	@echo "  ${GREEN}build-apk-images${RESET}      Build the Android builder Docker image"
+	@echo "  ${GREEN}build-apk-employer${RESET}    Generate Android dev APK for employer app"
+	@echo "  ${GREEN}build-apk-worker${RESET}      Generate Android dev APK for worker app"
 	@echo ""
 	@echo "${BLUE}Logs (Specific):${RESET}"
 	@echo "  ${YELLOW}logs-backend, logs-web, logs-mobile, logs-db, logs-redis...${RESET}"
@@ -62,10 +73,10 @@ build:
 logs:
 	$(DC) logs -f
 
-logs-employer:
+logs-mobile-employer:
 	$(DC) logs -f mobile-employer
 
-logs-worker:
+logs-mobile-worker:
 	$(DC) logs -f mobile-worker
 
 logs-backend:
@@ -100,8 +111,34 @@ web:
 mobile:
 	$(DC) up -d mobile-employer mobile-worker
 
-db_test:
-	$(DC) up -d db_test
+# Start the mobile worker application and the backend
+mobile-worker:
+	$(DC) up -d mobile-worker
+
+# Start the mobile employer application and the backend
+mobile-employer:
+	$(DC) up -d mobile-employer
+
+db-test:
+	$(DC) up -d db-test
+
+# --- Mobile APK Builds ---
+
+# Build the Android APK builder Docker image (under 'tools' profile)
+build-apk-images:
+	$(DC) --profile tools build
+
+# Build Android APK for employer app
+build-apk-employer:
+	@mkdir -p builds
+	@HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(DC) run --rm build-apk-employer
+	@echo "${GREEN}APK generated: builds/employer-dev.apk${RESET}"
+
+# Build Android APK for worker app
+build-apk-worker:
+	@mkdir -p builds
+	@HOST_UID=$(shell id -u) HOST_GID=$(shell id -g) $(DC) run --rm build-apk-worker
+	@echo "${GREEN}APK generated: builds/worker-dev.apk${RESET}"
 
 # --- Management commands ---
 
@@ -147,4 +184,4 @@ db-reset:
 		echo "${BLUE}Operation cancelled.${RESET}"; \
 	fi
 
-.PHONY: help all up down build logs backend web mobile db_test logs-db logs-redis pull-all main-all db-reset
+.PHONY: help all up down build logs backend web mobile db-test logs-db logs-redis pull-all main-all db-reset build-apk-images build-apk-employer build-apk-worker
